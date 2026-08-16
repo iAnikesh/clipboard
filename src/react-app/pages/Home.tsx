@@ -92,9 +92,9 @@ export default function Home() {
             disabled={loading}
           />
           {error && <p style={{ color: "#ef4444", marginTop: "0.5rem" }}>{error}</p>}
-          <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <div className="turnstile-container">
             <Turnstile 
-              siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "1x00000000000000000000AA"} 
+              siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAER-OJbnPU0yDDNs"} 
               onSuccess={(token) => setTurnstileToken(token)}
               ref={turnstileRef}
               options={{ theme: "dark" }}
