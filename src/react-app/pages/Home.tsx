@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Copy, Check, Clock, PlusCircle } from "lucide-react";
+import { Turnstile } from "@marsidev/react-turnstile";
+import type { TurnstileInstance } from "@marsidev/react-turnstile";
 import { getRemainingSeconds, formatTime } from "../utils/time";
 
 export default function Home() {
@@ -9,6 +11,9 @@ export default function Home() {
   const [result, setResult] = useState<{ url: string; expiresAt: string } | null>(null);
   const [copied, setCopied] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const turnstileRef = useRef<TurnstileInstance>(null);
 
   useEffect(() => {
     if (!result) return;
@@ -24,7 +29,7 @@ export default function Home() {
   }, [result]);
 
   const handleCreate = async () => {
-    if (!content.trim()) return;
+    if (!content.trim() || !turnstileToken) return;
     
     setLoading(true);
     setError("");
@@ -32,7 +37,7 @@ export default function Home() {
       const res = await fetch("/api/v1/paste", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content })
+        body: JSON.stringify({ content, turnstileToken })
       });
       
       let data;
@@ -49,8 +54,11 @@ export default function Home() {
       }
       
       setResult(data);
+      setTurnstileToken(""); // Reset in our state, the widget unmounts so no need to call reset()
     } catch (err: any) {
       setError(err.message);
+      turnstileRef.current?.reset();
+      setTurnstileToken("");
     } finally {
       setLoading(false);
     }
@@ -84,8 +92,14 @@ export default function Home() {
             disabled={loading}
           />
           {error && <p style={{ color: "#ef4444", marginTop: "0.5rem" }}>{error}</p>}
-          <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "flex-end" }}>
-            <button onClick={handleCreate} disabled={!content.trim() || loading}>
+          <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+            <Turnstile 
+              siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "1x00000000000000000000AA"} 
+              onSuccess={(token) => setTurnstileToken(token)}
+              ref={turnstileRef}
+              options={{ theme: "dark" }}
+            />
+            <button onClick={handleCreate} disabled={!content.trim() || !turnstileToken || loading}>
               {loading ? "Creating..." : "Create Link"}
             </button>
           </div>

@@ -22,6 +22,21 @@ function clientKey(c: Context<{ Bindings: Env }>): string {
 	return c.req.header("cf-connecting-ip") ?? "local";
 }
 
+async function verifyTurnstile(token: string, secret: string, ip: string): Promise<boolean> {
+	const formData = new FormData();
+	formData.append("secret", secret);
+	formData.append("response", token);
+	formData.append("remoteip", ip);
+
+	const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+		method: "POST",
+		body: formData,
+	});
+
+	const outcome = (await res.json()) as { success: boolean };
+	return !!outcome.success;
+}
+
 function ttlSeconds(env: Env): number {
 	const raw = env.PASTE_TTL_SECONDS ? Number(env.PASTE_TTL_SECONDS) : NaN;
 	return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_TTL_SECONDS;
@@ -51,8 +66,21 @@ paste.post("/", async (c) => {
 	}
 
 	const content = (body as { content?: unknown } | null)?.content;
+	const turnstileToken = (body as { turnstileToken?: unknown } | null)?.turnstileToken;
+
 	if (typeof content !== "string" || content.length === 0) {
 		return err(c, "`content` is required and must be a non-empty string.", 400);
+	}
+
+	if (typeof turnstileToken !== "string" || turnstileToken.length === 0) {
+		return err(c, "Captcha token is required.", 400);
+	}
+
+	const turnstileSecret = c.env.TURNSTILE_SECRET_KEY || "1x0000000000000000000000000000000AA"; // Dummy test key by default
+	const isValid = await verifyTurnstile(turnstileToken, turnstileSecret, clientKey(c));
+	
+	if (!isValid) {
+		return err(c, "Invalid Captcha.", 400);
 	}
 
 	const limit = maxBytes(c.env);

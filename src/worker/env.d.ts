@@ -23,4 +23,9 @@ interface Env {
 
 	/** Optional override for the paste TTL in seconds. Default: 3600 (1 hour). */
 	PASTE_TTL_SECONDS?: string;
+
+	/**
+	 * Cloudflare Turnstile Secret Key for verifying captchas.
+	 */
+	TURNSTILE_SECRET_KEY?: string;
 }
