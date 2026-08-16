@@ -21,10 +21,17 @@ export default function View({ params }: { params: { code: string } }) {
     const fetchPaste = async () => {
       try {
         const res = await fetch(`/api/v1/paste/${params.code}`);
-        const result = await res.json();
+        let result;
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          result = await res.json();
+        } else {
+          const text = await res.text();
+          throw new Error(text || "An unexpected error occurred.");
+        }
         
         if (!res.ok) {
-          throw new Error(result.error || "Failed to fetch paste");
+          throw new Error(result?.error || "Failed to fetch paste");
         }
         
         setData(result);
