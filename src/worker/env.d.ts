@@ -28,4 +28,7 @@ interface Env {
 	 * Cloudflare Turnstile Secret Key for verifying captchas.
 	 */
 	TURNSTILE_SECRET_KEY?: string;
+
+	/** Workers Static Assets binding */
+	ASSETS: Fetcher;
 }

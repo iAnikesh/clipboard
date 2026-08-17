@@ -121,8 +121,7 @@ paste.post("/", async (c) => {
 	return c.json(response, 201);
 });
 
-// GET /api/v1/paste/:code — fetch raw content + metadata as JSON.
-paste.get("/:code", async (c) => {
+export const getPasteHandler = async (c: Context<{ Bindings: Env }>) => {
 	const code = c.req.param("code");
 
 	if (!CODE_PATTERN.test(code)) {
@@ -136,18 +135,10 @@ paste.get("/:code", async (c) => {
 	const redis = getRedis(c.env);
 	const raw = await redis.get<PasteRecord | string>(`paste:${code}`);
 
-	// Redis's native TTL means an expired key and one that never existed are
-	// indistinguishable once it's gone from the keyspace — both just come
-	// back null. Storing a separate "this was valid once" tombstone would
-	// undercut the whole point of letting Redis self-clean (design doc §3),
-	// so both cases collapse to a single 404 here rather than the strict
-	// 404-vs-410 split in the route table.
 	if (raw === null || raw === undefined) {
 		return err(c, "This paste doesn't exist or has expired.", 404);
 	}
 
-	// @upstash/redis auto (de)serializes JSON values, but we defensively
-	// handle a plain string too in case that ever changes.
 	const record: PasteRecord = typeof raw === "string" ? JSON.parse(raw) : raw;
 
 	const response: GetPasteResponse = {
@@ -158,6 +149,10 @@ paste.get("/:code", async (c) => {
 	};
 
 	return c.json(response, 200);
-});
+};
+
+// GET /api/v1/paste/:code — fetch raw content + metadata as JSON.
+// Kept for backward compatibility if needed.
+paste.get("/:code", getPasteHandler);
 
 export default paste;
