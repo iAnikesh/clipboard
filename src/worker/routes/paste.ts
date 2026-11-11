@@ -26,15 +26,40 @@ async function verifyTurnstile(token: string, secret: string, ip: string): Promi
 	const formData = new FormData();
 	formData.append("secret", secret);
 	formData.append("response", token);
-	formData.append("remoteip", ip);
+	if (ip && ip !== "local" && ip !== "127.0.0.1") {
+		formData.append("remoteip", ip);
+	}
 
-	const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-		method: "POST",
-		body: formData,
-	});
+	try {
+		const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+			method: "POST",
+			body: formData,
+		});
 
-	const outcome = (await res.json()) as { success: boolean };
-	return !!outcome.success;
+		const outcome = (await res.json()) as { 
+			success: boolean; 
+			"error-codes"?: string[]; 
+			messages?: string[];
+		};
+
+		if (!outcome.success) {
+			console.error("Turnstile verification failed:", outcome);
+			// In local dev without a configured secret key (using dummy test secret),
+			// don't hard-block local development if a real sitekey was used on frontend
+			if (secret === "1x0000000000000000000000000000000AA" && (ip === "local" || ip === "127.0.0.1")) {
+				console.warn("Local dev: Turnstile verification bypassed because dummy secret is active without a matching secret in .dev.vars.");
+				return true;
+			}
+		}
+
+		return !!outcome.success;
+	} catch (err) {
+		console.error("Turnstile network error:", err);
+		if (secret === "1x0000000000000000000000000000000AA" && (ip === "local" || ip === "127.0.0.1")) {
+			return true;
+		}
+		return false;
+	}
 }
 
 function ttlSeconds(env: Env): number {
@@ -130,6 +155,15 @@ export const getPasteHandler = async (c: Context<{ Bindings: Env }>) => {
 
 	if (!allowRequest(`read:${clientKey(c)}`)) {
 		return err(c, "Too many requests, slow down.", 429);
+	}
+
+	const turnstileToken = c.req.header("cf-turnstile-response") || c.req.query("turnstileToken");
+	if (turnstileToken) {
+		const turnstileSecret = c.env.TURNSTILE_SECRET_KEY || "1x0000000000000000000000000000000AA";
+		const isValid = await verifyTurnstile(turnstileToken, turnstileSecret, clientKey(c));
+		if (!isValid) {
+			return err(c, "Invalid Captcha.", 400);
+		}
 	}
 
 	const redis = getRedis(c.env);

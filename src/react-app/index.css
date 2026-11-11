@@ -240,6 +240,114 @@ button.secondary:hover {
   100% { background-position: 200% 0; }
 }
 
+/* Tabs Container */
+.tabs-container {
+  display: flex;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 4px;
+  gap: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+  transform: none;
+  box-shadow: none;
+}
+
+.tab-btn.active {
+  background: var(--accent-color);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+
+/* Code Input Section */
+.code-input-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem 0 1.5rem 0;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2.25rem 1.5rem;
+}
+
+.code-label {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.code-hint {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  max-width: 420px;
+}
+
+.code-input {
+  width: 100%;
+  max-width: 260px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: 0.5rem;
+  text-align: center;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.code-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.code-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.3;
+  letter-spacing: 0.3rem;
+  font-size: 1.5rem;
+}
+
+.error-text {
+  color: #ef4444;
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 /* Turnstile Container */
 .turnstile-container {
   margin-top: 1.5rem;
@@ -267,6 +375,27 @@ button.secondary:hover {
   h2 {
     font-size: 1.1rem;
     margin-bottom: 1rem;
+  }
+
+  .tabs-container {
+    gap: 4px;
+    padding: 3px;
+  }
+
+  .tab-btn {
+    padding: 0.6rem 0.5rem;
+    font-size: 0.85rem;
+    gap: 0.35rem;
+  }
+
+  .code-input-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .code-input {
+    max-width: 100%;
+    font-size: 1.75rem;
+    letter-spacing: 0.35rem;
   }
   
   .turnstile-container {

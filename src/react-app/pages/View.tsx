@@ -20,7 +20,7 @@ export default function View({ params }: { params: { code: string } }) {
   useEffect(() => {
     const fetchPaste = async () => {
       try {
-        const res = await fetch(`${params.code}`);
+        const res = await fetch(`/api/v1/paste/${params.code}`);
         let result;
         const contentType = res.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
@@ -35,8 +35,8 @@ export default function View({ params }: { params: { code: string } }) {
         }
         
         setData(result);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "An unexpected error occurred");
       } finally {
         setLoading(false);
       }
