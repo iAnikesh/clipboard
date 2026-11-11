@@ -2,5 +2,5 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://clipboard.anikesh.dev/sitemap.xml
+Sitemap: https://cp.anikesh.dev/sitemap.xml
 
