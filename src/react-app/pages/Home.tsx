@@ -27,6 +27,10 @@ export default function Home() {
   const accessTurnstileRef = useRef<TurnstileInstance>(null);
 
   useEffect(() => {
+    document.title = "Online Clipboard | Free Text Sharing & Online Text Clipboard";
+  }, []);
+
+  useEffect(() => {
     if (!result) return;
     
     setTimeLeft(getRemainingSeconds(result.expiresAt));
@@ -151,9 +155,10 @@ export default function Home() {
   const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAER-OJbnPU0yDDNs";
 
   return (
-    <div className="glass-panel animate-fade-in">
-      <h1>Clipboard</h1>
-      <h2>Share text securely. Expires in 1 hour.</h2>
+    <>
+      <div className="glass-panel animate-fade-in">
+        <h1>Online Clipboard</h1>
+        <h2>Fast, secure text sharing &amp; online text clipboard. Pastes expire in 1 hour.</h2>
 
       <div className="tabs-container" role="tablist">
         <button
@@ -286,5 +291,61 @@ export default function Home() {
         </div>
       )}
     </div>
+
+    {/* SEO Features & Guide Section */}
+    <section className="seo-section animate-fade-in" aria-label="About Online Clipboard">
+      <div className="seo-card">
+        <h3>Why Use Our Online Clipboard?</h3>
+        <p className="seo-intro">
+          <strong>Online Clipboard</strong> is a free, temporary <strong>text sharing</strong> tool built for quick and secure copy-pasting across all your devices. Whether you need to transfer notes from mobile to desktop or share code snippets with a colleague, our <strong>text clipboard</strong> provides instant access with no login or setup required.
+        </p>
+
+        <div className="seo-grid">
+          <div className="seo-feature">
+            <div className="feature-icon">📋</div>
+            <h4>Cross-Device Text Clipboard</h4>
+            <p>Paste text online and access it from any browser, Mac, Windows, Linux, Android, or iOS device in seconds.</p>
+          </div>
+          <div className="seo-feature">
+            <div className="feature-icon">⚡</div>
+            <h4>Instant Text Sharing</h4>
+            <p>Generate shareable short links with one click. Share notes, links, and code snippets securely with anyone.</p>
+          </div>
+          <div className="seo-feature">
+            <div className="feature-icon">🔑</div>
+            <h4>4-Character Code Access</h4>
+            <p>Skip long URLs. Enter the 4-character code on the <em>Access Text</em> tab to retrieve shared clipboard text instantly.</p>
+          </div>
+          <div className="seo-feature">
+            <div className="feature-icon">🔒</div>
+            <h4>Safe &amp; Self-Destructing</h4>
+            <p>All shared pastes automatically expire and are permanently deleted after 1 hour, protected by Cloudflare Turnstile.</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="seo-card">
+        <h3>Frequently Asked Questions</h3>
+        <div className="faq-list">
+          <div className="faq-item">
+            <h4>What is an online clipboard?</h4>
+            <p>An online clipboard is a web tool that enables seamless text sharing between different devices over the internet without needing an account or messaging apps.</p>
+          </div>
+          <div className="faq-item">
+            <h4>How does text sharing work on this text clipboard?</h4>
+            <p>Paste your text in the "Paste Text" tab, complete the quick captcha, and click "Create Link". You will receive a short URL and a 4-character code to share.</p>
+          </div>
+          <div className="faq-item">
+            <h4>How long does shared text stay on the clipboard?</h4>
+            <p>Every paste expires automatically after 1 hour. Once expired, the content is permanently purged from our servers.</p>
+          </div>
+          <div className="faq-item">
+            <h4>How do I access someone's shared text?</h4>
+            <p>Navigate to the "Access Text" tab on any device, type the 4-character code, complete the Turnstile captcha, and click "Access Text" to read the shared content.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </>
   );
 }

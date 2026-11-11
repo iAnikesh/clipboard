@@ -18,6 +18,24 @@ export default function View({ params }: { params: { code: string } }) {
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   useEffect(() => {
+    const prevTitle = document.title;
+    document.title = `Paste ${params.code} | Online Clipboard`;
+
+    const robotsMeta = document.querySelector('meta[name="robots"]');
+    const originalRobots = robotsMeta ? robotsMeta.getAttribute("content") : null;
+    if (robotsMeta) {
+      robotsMeta.setAttribute("content", "noindex, nofollow");
+    }
+
+    return () => {
+      document.title = prevTitle;
+      if (originalRobots && robotsMeta) {
+        robotsMeta.setAttribute("content", originalRobots);
+      }
+    };
+  }, [params.code]);
+
+  useEffect(() => {
     const fetchPaste = async () => {
       try {
         const res = await fetch(`/api/v1/paste/${params.code}`);
